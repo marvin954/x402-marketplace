@@ -955,7 +955,9 @@ export async function generateOpenAPISpec() {
     }
   };
 
-  // Trading endpoints
+  // Trading endpoints — these are registered on the x402 marketplace
+  // and are managed by a separate project; they appear here for
+  // completeness but carry no live payment info in this marketplace spec.
   paths["/trading/prices"] = {
     get: {
       summary: "Get current prices for trading pairs",
@@ -992,6 +994,10 @@ export async function generateOpenAPISpec() {
           }
         },
         "500": { description: "Failed to fetch price data" }
+      },
+      "x-payment-info": {
+        price: { mode: "fixed", currency: "USD", amount: "0.001" },
+        protocols: [{ x402: { network: NETWORK, asset: USDC_ASSET, payTo: PAY_TO, maxTimeoutSeconds: 60 } }],
       }
     }
   };
@@ -1059,6 +1065,10 @@ export async function generateOpenAPISpec() {
         },
         "400": { description: "Validation error" },
         "500": { description: "Failed to initiate trade" }
+      },
+      "x-payment-info": {
+        price: { mode: "fixed", currency: "USD", amount: "0.01" },
+        protocols: [{ x402: { network: NETWORK, asset: USDC_ASSET, payTo: PAY_TO, maxTimeoutSeconds: 60 } }],
       }
     }
   };
@@ -1112,6 +1122,10 @@ export async function generateOpenAPISpec() {
         },
         "400": { description: "Validation error" },
         "500": { description: "Failed to check trade completion" }
+      },
+      "x-payment-info": {
+        price: { mode: "fixed", currency: "USD", amount: "0.005" },
+        protocols: [{ x402: { network: NETWORK, asset: USDC_ASSET, payTo: PAY_TO, maxTimeoutSeconds: 60 } }],
       }
     }
   };
