@@ -3,34 +3,19 @@ const { Pool } = pg;
 let _pool = null;
 
 function getConnectionString() {
-  // Construct connection string from individual POSTGRES variables if needed
-  let connectionString = process.env.storage_DATABASE_URL || process.env.DATABASE_URL || process.env.x4_DATABASE_URL;
+  // Use DATABASE_URL directly if set (takes priority)
+  if (process.env.DATABASE_URL) {
+    return process.env.DATABASE_URL;
+  }
 
-  console.log('[DB] Initial connectionString:', connectionString);
-
-  // If we have individual POSTGRES variables but no DATABASE_URL, construct it
-  if (!connectionString &&
-      process.env.POSTGRES_USER &&
-      process.env.POSTGRES_PASSWORD &&
-      process.env.POSTGRES_DB) {
+  // Fall back to individual POSTGRES variables
+  if (process.env.POSTGRES_USER && process.env.POSTGRES_PASSWORD && process.env.POSTGRES_DB) {
     const host = process.env.POSTGRES_HOST || 'localhost';
     const port = process.env.POSTGRES_PORT || '5432';
-    connectionString = `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${host}:${port}/${process.env.POSTGRES_DB}`;
-    console.log('[DB] Constructed connectionString from POSTGRES vars:', connectionString);
+    return `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@${host}:${port}/${process.env.POSTGRES_DB}`;
   }
 
-  if (!connectionString) {
-    console.log('[DB] No connection string found. Env vars:');
-    console.log('[DB]   storage_DATABASE_URL:', !!process.env.storage_DATABASE_URL);
-    console.log('[DB]   DATABASE_URL:', !!process.env.DATABASE_URL);
-    console.log('[DB]   x4_DATABASE_URL:', !!process.env.x4_DATABASE_URL);
-    console.log('[DB]   POSTGRES_USER:', !!process.env.POSTGRES_USER);
-    console.log('[DB]   POSTGRES_PASSWORD:', !!process.env.POSTGRES_PASSWORD);
-    console.log('[DB]   POSTGRES_DB:', !!process.env.POSTGRES_DB);
-    throw new Error("DATABASE_URL is not set in Vercel env vars.");
-  }
-
-  return connectionString;
+  throw new Error("DATABASE_URL is not set in Vercel env vars.");
 }
 
 function getPool() {
